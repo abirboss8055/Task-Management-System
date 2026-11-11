@@ -1,0 +1,110 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// ENUMS
+// ----------------------------------------------------
+
+enum Role {
+  MANAGER
+  EMPLOYEE
+}
+
+enum Status {
+  PENDING
+  SCHEDULED
+  IN_PROGRESS
+  DONE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+// ----------------------------------------------------
+// MODELS
+// ----------------------------------------------------
+
+model User {
+  ID            Int      @id @default(autoincrement())
+  Full_Name     String   @db.VarChar(100)
+  Username      String   @unique @db.VarChar(50)
+  Password_Hash String   @db.VarChar(255)
+  Role          Role     @default(EMPLOYEE)
+
+  // Relations
+  Created_Tasks  Task[]    @relation("TaskCreator")
+  Assigned_Tasks Task[]    @relation("TaskAssignee")
+  Comments       Comment[]
+
+  @@map("users")
+}
+
+model Task {
+  ID                   Int       @id @default(autoincrement())
+  Title                String    @db.VarChar(255)
+  Description          String?   @db.Text
+  Category             String    @db.VarChar(100)
+  Status               Status    @default(PENDING)
+  Priority             Priority  @default(MEDIUM)
+  Created_At           DateTime  @default(now())
+  Scheduled_Start_Date DateTime?
+  Completed_Date       DateTime?
+
+  // Creator (Manager)
+  Manager_ID Int
+  Manager    User @relation("TaskCreator", fields: [Manager_ID], references: [ID], onDelete: Restrict)
+
+  // Assignee (Employee) - Optional to allow unassigned tasks
+  Employee_ID Int?
+  Employee    User? @relation("TaskAssignee", fields: [Employee_ID], references: [ID], onDelete: SetNull)
+
+  // Relations
+  Links    Task_Link[]
+  Comments Comment[]
+
+  @@index([Manager_ID])
+  @@index([Employee_ID])
+  @@index([Status])
+  @@index([Category])
+  @@map("tasks")
+}
+
+model Task_Link {
+  ID      Int    @id @default(autoincrement())
+  Task_ID Int
+  URL     String @db.Text
+
+  // Relations
+  Task Task @relation(fields: [Task_ID], references: [ID], onDelete: Cascade)
+
+  @@index([Task_ID])
+  @@map("task_links")
+}
+
+model Comment {
+  ID         Int      @id @default(autoincrement())
+  Task_ID    Int
+  User_ID    Int
+  Content    String   @db.Text
+  Created_At DateTime @default(now())
+
+  // Relations
+  Task Task @relation(fields: [Task_ID], references: [ID], onDelete: Cascade)
+  User User @relation(fields: [User_ID], references: [ID], onDelete: Cascade)
+
+  @@index([Task_ID])
+  @@index([User_ID])
+  @@map("comments")
+}

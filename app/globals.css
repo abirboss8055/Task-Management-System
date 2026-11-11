@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-ivory: #FFFFF0;
+  --surface-white: #FFFFFF;
+  --primary-maroon: #7B1818;
+  --accent-navy: #0B2545;
+  --border-line: #E3DEC3;
+}
+
+body {
+  background-color: var(--bg-ivory);
+  color: var(--accent-navy);
+  font-family: 'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enforce Modern Heritage Strict Flat Design & Sharp Corners */
+*,
+*::before,
+*::after {
+  border-radius: 0px !important;
+  box-shadow: none !important;
+}
+
+/* Custom editorial scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFFF0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D5CEAE;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7B1818;
+}
